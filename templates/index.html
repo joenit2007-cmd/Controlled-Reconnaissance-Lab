@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlled Reconnaissance Lab - Security Operations Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa fa-shield-halved"></i>
+            </div>
+            <div class="brand-text">
+                <h1>RECON LAB</h1>
+                <span class="brand-badge">Defensive Lab</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-header">Main Dashboard</div>
+            <a href="#" class="nav-item active" data-tab="overview">
+                <i class="fa fa-chart-line"></i>
+                <span>Overview</span>
+            </a>
+
+            <div class="nav-header">Fundamentals</div>
+            <a href="#" class="nav-item" data-tab="linux">
+                <i class="fa-brands fa-linux"></i>
+                <span>Linux Fundamentals</span>
+            </a>
+
+            <div class="nav-header">Reconnaissance</div>
+            <a href="#" class="nav-item" data-tab="dns">
+                <i class="fa fa-globe"></i>
+                <span>DNS Reconnaissance</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="nmap">
+                <i class="fa fa-network-wired"></i>
+                <span>Nmap Scanning</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="net_enum">
+                <i class="fa fa-sitemap"></i>
+                <span>Network Enumeration</span>
+            </a>
+
+            <div class="nav-header">Traffic & Web</div>
+            <a href="#" class="nav-item" data-tab="pcap">
+                <i class="fa fa-file-waveform"></i>
+                <span>PCAP Packet Analysis</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="web_sec">
+                <i class="fa fa-lock"></i>
+                <span>Web Security (Burp/ZAP)</span>
+            </a>
+
+            <div class="nav-header">Management</div>
+            <a href="#" class="nav-item" data-tab="findings">
+                <i class="fa fa-bug"></i>
+                <span>Security Findings</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="scans">
+                <i class="fa fa-clock-rotate-left"></i>
+                <span>Scan History</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="reports">
+                <i class="fa fa-file-pdf"></i>
+                <span>Assessment Reports</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="guardrail-tag">
+                <i class="fa fa-circle-check"></i>
+                <span>Scope: RFC 1918 / Localhost</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-area">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="current-view-title" id="current-view-title">
+                    <i class="fa fa-chart-line"></i> Overview Dashboard
+                </div>
+                <div class="scope-indicator">
+                    <i class="fa fa-lock"></i> Authorized Controlled Lab Mode
+                </div>
+            </div>
+            <div class="topbar-right">
+                <span style="font-size: 11.5px; color: #94a3b8;"><i class="fa fa-server"></i> Target: <code>127.0.0.1</code></span>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Viewport -->
+        <div class="content-viewport">
+
+            <!-- 1. OVERVIEW DASHBOARD -->
+            <section class="tab-panel active" id="panel-overview">
+                <!-- Metrics Grid -->
+                <div class="grid-cols-4">
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>Total Scans Run</h3>
+                            <div class="stat-value" id="stat-total-scans">0</div>
+                        </div>
+                        <div class="stat-icon icon-blue"><i class="fa fa-satellite-dish"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>Total Findings</h3>
+                            <div class="stat-value" id="stat-total-findings">0</div>
+                        </div>
+                        <div class="stat-icon icon-amber"><i class="fa fa-bug"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>Critical / High</h3>
+                            <div class="stat-value" id="stat-crit-high">0 / 0</div>
+                        </div>
+                        <div class="stat-icon icon-rose"><i class="fa fa-triangle-exclamation"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>Safety Boundaries</h3>
+                            <div class="stat-value" style="font-size:18px;color:#34d399;">ENFORCED</div>
+                        </div>
+                        <div class="stat-icon icon-emerald"><i class="fa fa-shield-virus"></i></div>
+                    </div>
+                </div>
+
+                <!-- Integrated Tools Status Cards -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-toolbox"></i> Integrated Security Tool Status</div>
+                        <span style="font-size: 11.5px; color: #94a3b8;">Automated Host Environment Detection</span>
+                    </div>
+                    <div class="grid-cols-4" style="margin-bottom: 0;">
+                        <div style="background:#090f1d;padding:12px;border-radius:6px;border:1px solid #1e293b;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                                <b>Nmap Scanner</b>
+                                <span class="badge" id="overview-nmap-badge">Checking...</span>
+                            </div>
+                            <p style="font-size:11.5px;color:#94a3b8;">Active port & service detection engine with pure-Python socket fallback.</p>
+                        </div>
+                        <div style="background:#090f1d;padding:12px;border-radius:6px;border:1px solid #1e293b;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                                <b>Wireshark / PCAP</b>
+                                <span class="badge" id="overview-tshark-badge">Active</span>
+                            </div>
+                            <p style="font-size:11.5px;color:#94a3b8;">Native PCAP/PCAPNG packet decoder & security anomaly classifier.</p>
+                        </div>
+                        <div style="background:#090f1d;padding:12px;border-radius:6px;border:1px solid #1e293b;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                                <b>PortSwigger Burp</b>
+                                <span class="badge" id="overview-burp-badge">Probing...</span>
+                            </div>
+                            <p style="font-size:11.5px;color:#94a3b8;">Listener detection on 127.0.0.1:8080 & proxy navigation guides.</p>
+                        </div>
+                        <div style="background:#090f1d;padding:12px;border-radius:6px;border:1px solid #1e293b;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                                <b>OWASP ZAP</b>
+                                <span class="badge" id="overview-zap-badge">Probing...</span>
+                            </div>
+                            <p style="font-size:11.5px;color:#94a3b8;">API listener detection on 127.0.0.1:8090 & baseline scan profiles.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Split -->
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-history"></i> Recent Reconnaissance Scans</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Target</th>
+                                        <th>Status</th>
+                                        <th>Time</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overview-recent-scans">
+                                    <tr><td colspan="5" class="text-muted" style="text-align:center;">Loading scans...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-triangle-exclamation"></i> Active Discovered Findings</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Severity</th>
+                                        <th>Title</th>
+                                        <th>Target</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overview-recent-findings">
+                                    <tr><td colspan="4" class="text-muted" style="text-align:center;">Loading findings...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. LINUX FUNDAMENTALS -->
+            <section class="tab-panel" id="panel-linux">
+                <div class="subtabs">
+                    <button class="subtab-btn active" data-subview="subview-linux-fhs"><i class="fa fa-folder-tree"></i> Files & Hierarchy (FHS)</button>
+                    <button class="subtab-btn" data-subview="subview-linux-calc"><i class="fa fa-calculator"></i> Permission Calculator</button>
+                    <button class="subtab-btn" data-subview="subview-linux-term"><i class="fa fa-terminal"></i> Command Sandbox</button>
+                    <button class="subtab-btn" data-subview="subview-linux-quiz"><i class="fa fa-graduation-cap"></i> Security Quiz</button>
+                </div>
+
+                <!-- FHS & Guides Subview -->
+                <div class="linux-subview" id="subview-linux-fhs">
+                    <div class="grid-cols-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-folder-open"></i> Key Security Filesystem Paths</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:12px;">
+                                <div style="background:#090f1d;padding:12px;border-radius:6px;border-left:3px solid #38bdf8;">
+                                    <b style="color:#38bdf8;">/etc</b> - System-wide configuration
+                                    <p style="font-size:12px;color:#94a3b8;margin-top:4px;">Contains <code>/etc/passwd</code> (accounts), <code>/etc/shadow</code> (hashes), <code>/etc/sudoers</code>, and network service daemons.</p>
+                                </div>
+                                <div style="background:#090f1d;padding:12px;border-radius:6px;border-left:3px solid #f59e0b;">
+                                    <b style="color:#f59e0b;">/var/log</b> - Audit & Intrusion Logs
+                                    <p style="font-size:12px;color:#94a3b8;margin-top:4px;">Contains <code>auth.log</code>, <code>syslog</code>, and web server logs. Crucial for incident response and tracking recon probes.</p>
+                                </div>
+                                <div style="background:#090f1d;padding:12px;border-radius:6px;border-left:3px solid #a855f7;">
+                                    <b style="color:#a855f7;">/proc & /sys</b> - Kernel Virtual Interfaces
+                                    <p style="font-size:12px;color:#94a3b8;margin-top:4px;">Live process memory tables. Inspecting <code>/proc/[PID]/cmdline</code> reveals full arguments of running commands.</p>
+                                </div>
+                                <div style="background:#090f1d;padding:12px;border-radius:6px;border-left:3px solid #ef4444;">
+                                    <b style="color:#ef4444;">/tmp & /var/tmp</b> - Staging Areas
+                                    <p style="font-size:12px;color:#94a3b8;margin-top:4px;">World-writable directories with Sticky bit (1777). Commonly leveraged in penetration testing to stage scripts.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-key"></i> Discretionary Access Controls (DAC)</div>
+                            </div>
+                            <p style="font-size:12.5px;color:#94a3b8;margin-bottom:12px;">Linux file permissions are represented as 3 triads: Owner (User), Group, and Others, each with Read (4), Write (2), and Execute (1) weights.</p>
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Octal</th>
+                                        <th>Symbolic</th>
+                                        <th>Security Meaning</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>755</code></td>
+                                        <td><code>rwxr-xr-x</code></td>
+                                        <td>Standard for system binaries and directories. Owner full, others read/traverse.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>644</code></td>
+                                        <td><code>rw-r--r--</code></td>
+                                        <td>Standard configuration files (e.g. /etc/passwd). Readable by all, writable by root.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>600</code></td>
+                                        <td><code>rw-------</code></td>
+                                        <td>Sensitive files (SSH private keys, /etc/shadow). Owner read/write only.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>4755</code></td>
+                                        <td><code>rwsr-xr-x</code></td>
+                                        <td><span class="badge badge-high">SUID Bit</span> Runs with file owner permissions (e.g. /usr/bin/passwd).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>777</code></td>
+                                        <td><code>rwxrwxrwx</code></td>
+                                        <td><span class="badge badge-critical">Critical Risk</span> World-writable. Any local account can overwrite code.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permission Calculator Subview -->
+                <div class="linux-subview" id="subview-linux-calc" style="display:none;">
+                    <div class="grid-cols-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-sliders"></i> Interactive Permission Toggle</div>
+                            </div>
+                            <div class="perm-matrix" style="margin-bottom:14px;">
+                                <div><b>Tier</b></div>
+                                <div><b>Read (4)</b></div>
+                                <div><b>Write (2)</b></div>
+                                <div><b>Execute (1)</b></div>
+
+                                <div>Owner</div>
+                                <div><input type="checkbox" id="p_ur" class="perm-calc-input" checked></div>
+                                <div><input type="checkbox" id="p_uw" class="perm-calc-input" checked></div>
+                                <div><input type="checkbox" id="p_ux" class="perm-calc-input" checked></div>
+
+                                <div>Group</div>
+                                <div><input type="checkbox" id="p_gr" class="perm-calc-input" checked></div>
+                                <div><input type="checkbox" id="p_gw" class="perm-calc-input"></div>
+                                <div><input type="checkbox" id="p_gx" class="perm-calc-input" checked></div>
+
+                                <div>Others</div>
+                                <div><input type="checkbox" id="p_or" class="perm-calc-input" checked></div>
+                                <div><input type="checkbox" id="p_ow" class="perm-calc-input"></div>
+                                <div><input type="checkbox" id="p_ox" class="perm-calc-input" checked></div>
+                            </div>
+
+                            <div style="background:#090f1d;padding:12px;border-radius:6px;border:1px solid #1e293b;margin-bottom:12px;">
+                                <b style="font-size:12px;color:#fff;display:block;margin-bottom:8px;">Special Security Bits:</b>
+                                <div style="display:flex;gap:16px;">
+                                    <label style="font-size:12px;color:#94a3b8;cursor:pointer;"><input type="checkbox" id="p_suid" class="perm-calc-input"> SUID (4000)</label>
+                                    <label style="font-size:12px;color:#94a3b8;cursor:pointer;"><input type="checkbox" id="p_sgid" class="perm-calc-input"> SGID (2000)</label>
+                                    <label style="font-size:12px;color:#94a3b8;cursor:pointer;"><input type="checkbox" id="p_sticky" class="perm-calc-input"> Sticky Bit (1000)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-shield-halved"></i> Calculated Result & Security Audit</div>
+                                <span class="badge" id="calc-risk-level">Evaluating...</span>
+                            </div>
+                            <div style="background:#090f1d;padding:16px;border-radius:6px;border:1px solid #1e293b;margin-bottom:14px;">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                    <span style="color:#94a3b8;">Octal Notation:</span>
+                                    <b style="font-size:18px;color:#38bdf8;" id="calc-octal">0755</b>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                                    <span style="color:#94a3b8;">Symbolic Representation:</span>
+                                    <code style="font-size:16px;color:#34d399;" id="calc-symbolic">-rwxr-xr-x</code>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;">
+                                    <span style="color:#94a3b8;">Chmod Execution:</span>
+                                    <code style="font-size:13px;color:#f59e0b;" id="calc-cmd">chmod 755 target_file</code>
+                                </div>
+                            </div>
+                            <h4 style="font-size:12px;color:#fff;margin-bottom:6px;">Security Assessment:</h4>
+                            <div id="calc-assessments" style="color:#94a3b8;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command Simulator Subview -->
+                <div class="linux-subview" id="subview-linux-term" style="display:none;">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-terminal"></i> Safe Linux Command Simulator</div>
+                            <span style="font-size:11.5px;color:#94a3b8;">Click sample commands or type below</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="ls -la /etc/passwd">ls -la /etc/passwd</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="ls -la /etc/shadow">ls -la /etc/shadow</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="id">id</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="cat /etc/os-release">cat /etc/os-release</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="ps aux | head -n 8">ps aux</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="find / -perm -4000 -type f 2>/dev/null">SUID Search</button>
+                            <button class="btn btn-secondary btn-sm cmd-pill" data-cmd="ufw status">ufw status</button>
+                        </div>
+                        <div class="form-inline" style="margin-bottom:14px;">
+                            <div style="flex:1;">
+                                <input type="text" id="linux-cmd-input" class="form-input" placeholder="Type simulated command (e.g. 'id', 'ls -la /etc/passwd')...">
+                            </div>
+                            <button id="linux-cmd-submit" class="btn btn-primary"><i class="fa fa-play"></i> Run</button>
+                        </div>
+                        <div class="terminal-window">
+                            <div class="terminal-header">
+                                <div class="terminal-dots">
+                                    <div class="dot dot-red"></div>
+                                    <div class="dot dot-yellow"></div>
+                                    <div class="dot dot-green"></div>
+                                </div>
+                                <span style="font-size:11px;color:#64748b;">bash sandbox session (student@lab)</span>
+                            </div>
+                            <div class="terminal-body" id="linux-term-output">Linux 6.8.0-45-generic x86_64 GNU/Linux
+Controlled Reconnaissance Lab - Interactive Shell
+Type a reconnaissance command or click a quick command pill above.
+$ </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Subview -->
+                <div class="linux-subview" id="subview-linux-quiz" style="display:none;">
+                    <div class="card" style="max-width:800px;margin:0 auto;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-graduation-cap"></i> Linux Security Knowledge Assessment</div>
+                        </div>
+                        <div id="linux-quiz-container">
+                            <p class="text-muted">Loading questions...</p>
+                        </div>
+                        <div id="linux-quiz-result" style="display:none;margin-top:16px;"></div>
+                        <div style="margin-top:16px;text-align:right;">
+                            <button id="linux-quiz-submit" class="btn btn-success"><i class="fa fa-check-circle"></i> Submit Answers & Save Progress</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. DNS RECONNAISSANCE -->
+            <section class="tab-panel" id="panel-dns">
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-globe"></i> DNS & Domain Information Gathering</div>
+                        <div class="scope-indicator"><i class="fa fa-shield"></i> Scope: Lab / Localhost / .local</div>
+                    </div>
+                    <div class="form-inline">
+                        <div style="flex:1;">
+                            <label class="form-label">Target Domain or Hostname</label>
+                            <input type="text" id="dns-domain-input" class="form-input" value="lab.local" placeholder="e.g. lab.local, internal.test, localhost">
+                        </div>
+                        <button id="btn-run-dns" class="btn btn-primary"><i class="fa fa-search"></i> Run DNS Recon</button>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:8px;">
+                        <span style="font-size:11.5px;color:#64748b;">Quick Lab Presets:</span>
+                        <a href="javascript:void(0)" onclick="document.getElementById('dns-domain-input').value='lab.local'" style="font-size:11.5px;color:#38bdf8;">lab.local</a> | 
+                        <a href="javascript:void(0)" onclick="document.getElementById('dns-domain-input').value='internal.test'" style="font-size:11.5px;color:#38bdf8;">internal.test</a> | 
+                        <a href="javascript:void(0)" onclick="document.getElementById('dns-domain-input').value='localhost'" style="font-size:11.5px;color:#38bdf8;">localhost</a>
+                    </div>
+                </div>
+
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-list"></i> Discovered DNS Records</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Record Type</th>
+                                        <th>Values / Target</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dns-records-tbody">
+                                    <tr><td colspan="2" class="text-muted">No records queried yet. Run query above.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-sitemap"></i> Enumerated Active Subdomains</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Subdomain</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dns-subdomains-tbody">
+                                    <tr><td colspan="3" class="text-muted">No subdomains discovered yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-triangle-exclamation"></i> Security Observations & Misconfigurations</div>
+                        </div>
+                        <div id="dns-findings-list">
+                            <p class="text-muted" style="font-size:12px;">Run DNS Recon to detect SPF/DMARC anomalies and sensitive exposed subdomains.</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-terminal"></i> Raw DNS Query Output</div>
+                        </div>
+                        <div class="terminal-window">
+                            <div class="terminal-body" id="dns-raw-output" style="max-height:220px;">[DNS Resolver Standby]</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. NMAP SCANNING -->
+            <section class="tab-panel" id="panel-nmap">
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-network-wired"></i> Nmap Port & Service Scanner</div>
+                        <div>
+                            <span class="badge badge-low" id="nmap-active-engine">Nmap 7.992 Available</span>
+                        </div>
+                    </div>
+                    <div class="alert-box alert-info">
+                        <i class="fa fa-shield"></i>
+                        <div><b>Strict Scope Guardrail:</b> Target must be <code>127.0.0.1</code> (localhost) or an RFC 1918 private IP address (10.x, 172.16-31.x, 192.168.x). Public IP scanning is blocked.</div>
+                    </div>
+                    <div class="grid-cols-3" style="align-items:flex-end;">
+                        <div>
+                            <label class="form-label">Target IP / Lab Host</label>
+                            <input type="text" id="nmap-target-input" class="form-input" value="127.0.0.1" placeholder="127.0.0.1">
+                        </div>
+                        <div>
+                            <label class="form-label">Scan Profile</label>
+                            <select id="nmap-profile-select" class="form-select">
+                                <option value="quick">Quick TCP Connect (Top 20 Ports)</option>
+                                <option value="service_version">Service Version Detection (-sV)</option>
+                                <option value="comprehensive">Well-Known Ports (1-1024)</option>
+                                <option value="custom">Custom Port Specification</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Custom Ports (for Custom Profile)</label>
+                            <input type="text" id="nmap-custom-ports" class="form-input" placeholder="e.g. 21,22,80,443,3306" disabled>
+                        </div>
+                    </div>
+                    <div style="margin-top:14px;text-align:right;">
+                        <button id="btn-run-nmap" class="btn btn-primary"><i class="fa fa-play"></i> Start Scan</button>
+                    </div>
+                </div>
+
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-door-open"></i> Discovered Ports & Services</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Port / Proto</th>
+                                        <th>State</th>
+                                        <th>Service</th>
+                                        <th>Version / Banner</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nmap-ports-tbody">
+                                    <tr><td colspan="4" class="text-muted" style="text-align:center;">No scan results yet. Start scan above.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-triangle-exclamation"></i> Port Security Analysis</div>
+                        </div>
+                        <div id="nmap-findings-list">
+                            <p class="text-muted" style="font-size:12px;">Automatic port exposure findings will populate here upon scan completion.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-terminal"></i> Raw Terminal Output</div>
+                    </div>
+                    <div class="terminal-window">
+                        <div class="terminal-body" id="nmap-raw-output" style="max-height:260px;">[Nmap Engine Standby]</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. NETWORK ENUMERATION -->
+            <section class="tab-panel" id="panel-net_enum">
+                <div class="subtabs">
+                    <button class="subtab-btn active" data-subview="subview-net-iface"><i class="fa fa-ethernet"></i> Local Interfaces</button>
+                    <button class="subtab-btn" data-subview="subview-net-sweep"><i class="fa fa-radar"></i> Subnet Live-Host Sweep</button>
+                    <button class="subtab-btn" data-subview="subview-net-banner"><i class="fa fa-bullhorn"></i> Service Banner Grabber</button>
+                </div>
+
+                <!-- Interfaces Subview -->
+                <div class="net-subview" id="subview-net-iface">
+                    <div class="grid-cols-3" id="net-interfaces-grid">
+                        <div class="card text-muted">Loading network adapters...</div>
+                    </div>
+                </div>
+
+                <!-- Subnet Sweep Subview -->
+                <div class="net-subview" id="subview-net-sweep" style="display:none;">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-radar"></i> Fast Private Subnet Sweep</div>
+                        </div>
+                        <div class="form-inline">
+                            <div style="flex:1;">
+                                <label class="form-label">Private Lab CIDR Range</label>
+                                <input type="text" id="net-sweep-cidr" class="form-input" value="127.0.0.1/32" placeholder="e.g. 127.0.0.1/32 or 192.168.1.0/24">
+                            </div>
+                            <button id="btn-run-sweep" class="btn btn-primary"><i class="fa fa-radar"></i> Sweep Subnet</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-server"></i> Responsive Live Hosts</div>
+                        </div>
+                        <div class="table-container">
+                            <table class="cyber-table">
+                                <thead>
+                                    <tr>
+                                        <th>Host IP</th>
+                                        <th>Status</th>
+                                        <th>Responsive Port</th>
+                                        <th>Roundtrip Latency</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="net-sweep-tbody">
+                                    <tr><td colspan="4" class="text-muted" style="text-align:center;">Run a subnet sweep to discover online lab devices.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Grabber Subview -->
+                <div class="net-subview" id="subview-net-banner" style="display:none;">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-bullhorn"></i> Safe Non-Destructive Banner Grabber</div>
+                        </div>
+                        <div class="grid-cols-3" style="align-items:flex-end;">
+                            <div>
+                                <label class="form-label">Target Host</label>
+                                <input type="text" id="banner-target" class="form-input" value="127.0.0.1">
+                            </div>
+                            <div>
+                                <label class="form-label">Port</label>
+                                <input type="number" id="banner-port" class="form-input" value="80">
+                            </div>
+                            <div>
+                                <button id="btn-grab-banner" class="btn btn-primary" style="width:100%;"><i class="fa fa-terminal"></i> Grab Banner</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-receipt"></i> Captured Service Response</div>
+                        </div>
+                        <div class="terminal-window">
+                            <div class="terminal-body" id="banner-output" style="max-height:220px;">[Banner Grabber Standby]</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. PCAP PACKET ANALYSIS -->
+            <section class="tab-panel" id="panel-pcap">
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-file-waveform"></i> Wireshark & PCAP Capture File Analysis</div>
+                        <button id="btn-analyze-sample-pcap" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-play-circle"></i> Analyze Pre-loaded Lab Sample PCAP
+                        </button>
+                    </div>
+                    <div class="dropzone" id="pcap-dropzone">
+                        <i class="fa fa-cloud-arrow-up" style="font-size:32px;color:#38bdf8;margin-bottom:8px;"></i>
+                        <h4 style="font-size:14px;font-weight:600;margin-bottom:4px;">Drag & Drop .pcap or .pcapng Capture File</h4>
+                        <p style="font-size:12px;color:#94a3b8;">or click to select file from your system</p>
+                        <input type="file" id="pcap-file-input" style="display:none;" accept=".pcap,.pcapng,.cap">
+                    </div>
+                </div>
+
+                <!-- PCAP Metrics -->
+                <div class="grid-cols-6">
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>Total Packets</h3>
+                            <div class="stat-value" id="pcap-stat-total">0</div>
+                        </div>
+                        <div class="stat-icon icon-blue"><i class="fa fa-boxes-packing"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>TCP Packets</h3>
+                            <div class="stat-value" id="pcap-stat-tcp">0</div>
+                        </div>
+                        <div class="stat-icon icon-purple"><i class="fa fa-arrows-split-up-and-left"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>UDP Packets</h3>
+                            <div class="stat-value" id="pcap-stat-udp">0</div>
+                        </div>
+                        <div class="stat-icon icon-blue"><i class="fa fa-network-wired"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>DNS Lookups</h3>
+                            <div class="stat-value" id="pcap-stat-dns">0</div>
+                        </div>
+                        <div class="stat-icon icon-emerald"><i class="fa fa-compass"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>HTTP / Plaintext</h3>
+                            <div class="stat-value" id="pcap-stat-http">0</div>
+                        </div>
+                        <div class="stat-icon icon-amber"><i class="fa fa-file-lines"></i></div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-info">
+                            <h3>ARP Frames</h3>
+                            <div class="stat-value" id="pcap-stat-arp">0</div>
+                        </div>
+                        <div class="stat-icon icon-rose"><i class="fa fa-layer-group"></i></div>
+                    </div>
+                </div>
+
+                <!-- Security Alerts & Talkers -->
+                <div class="grid-cols-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-triangle-exclamation"></i> Security Incidents & Flags Detected</div>
+                        </div>
+                        <div id="pcap-alerts-container">
+                            <p class="text-muted" style="font-size:12px;">No packet capture loaded. Click 'Analyze Pre-loaded Lab Sample PCAP' above.</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-chart-pie"></i> Top Network Talkers</div>
+                        </div>
+                        <ul id="pcap-top-talkers" style="list-style:none;">
+                            <li class="text-muted" style="font-size:12px;">No traffic conversation data loaded.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Decoded Packet Table -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-table-list"></i> Decoded Packet Stream</div>
+                        <span style="font-size:11.5px;color:#94a3b8;">Click any packet to inspect raw payload</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Source</th>
+                                    <th>Destination</th>
+                                    <th>Protocol</th>
+                                    <th>Length</th>
+                                    <th>Summary Info</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pcap-packets-tbody">
+                                <tr><td colspan="6" class="text-muted" style="text-align:center;">Upload a PCAP or run the sample capture above.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Wireshark Filter Cheatsheet -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-filter"></i> Wireshark Display Filter Guide & Cheatsheet</div>
+                    </div>
+                    <div class="grid-cols-3" id="wireshark-filters-grid"></div>
+                </div>
+            </section>
+
+            <!-- 7. WEB SECURITY (BURP & ZAP) -->
+            <section class="tab-panel" id="panel-web_sec">
+                <div class="subtabs">
+                    <button class="subtab-btn active" data-subview="subview-web-burp"><i class="fa fa-circle-nodes"></i> PortSwigger Burp Suite Guide</button>
+                    <button class="subtab-btn" data-subview="subview-web-zap"><i class="fa fa-spider"></i> OWASP ZAP Guide</button>
+                    <button class="subtab-btn" data-subview="subview-web-audit"><i class="fa fa-shield-alt"></i> Security Header Auditor</button>
+                </div>
+
+                <!-- Burp Subview -->
+                <div class="web-subview" id="subview-web-burp">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-circle-nodes"></i> Burp Suite Integration & Proxy Listener Status</div>
+                            <span class="badge" id="web-burp-status-badge">Checking...</span>
+                        </div>
+                        <p id="web-burp-details" style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Port 8080 probe details loading...</p>
+                        <div style="background:#090f1d;padding:14px;border-radius:6px;border:1px solid #1e293b;">
+                            <h4 style="font-size:13px;color:#38bdf8;margin-bottom:8px;">Standard Lab Setup Protocol:</h4>
+                            <ol style="padding-left:18px;font-size:12.5px;color:#94a3b8;line-height:1.7;">
+                                <li><b>Proxy Configuration:</b> Open Burp -> Settings -> Tools -> Proxy. Confirm listener on <code>127.0.0.1:8080</code> is running.</li>
+                                <li><b>CA Certificate Import:</b> Browse to <code>http://burp/</code> while proxying, click <i>CA Certificate</i>, and import into Firefox/Chrome Trusted Root Authorities.</li>
+                                <li><b>Target Scope:</b> Set Target -> Scope to <code>http://127.0.0.1:5000/</code> to confine testing strictly to this lab.</li>
+                                <li><b>Reconnaissance Mapping:</b> Navigate the application. Burp's Proxy -> HTTP History records parameters, headers, cookies, and hidden endpoints.</li>
+                                <li><b>Repeater Probing:</b> Send interesting requests to Repeater (Ctrl+R) to inspect response variance against modified payloads.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZAP Subview -->
+                <div class="web-subview" id="subview-web-zap" style="display:none;">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-spider"></i> OWASP ZAP (Zed Attack Proxy) Integration</div>
+                            <span class="badge" id="web-zap-status-badge">Checking...</span>
+                        </div>
+                        <p id="web-zap-details" style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Port 8090 probe details loading...</p>
+                        <div style="background:#090f1d;padding:14px;border-radius:6px;border:1px solid #1e293b;">
+                            <h4 style="font-size:13px;color:#38bdf8;margin-bottom:8px;">Headless / Automated Lab Usage:</h4>
+                            <p style="font-size:12px;color:#94a3b8;margin-bottom:8px;">Launch ZAP in automated daemon mode on Kali Linux or Windows terminal:</p>
+                            <code style="display:block;background:#030712;padding:8px 12px;border-radius:4px;color:#34d399;font-size:12px;margin-bottom:10px;">zaproxy -daemon -port 8090 -config api.disablekey=true</code>
+                            <p style="font-size:12px;color:#94a3b8;">Run baseline passive reconnaissance against lab applications without triggering intrusive attacks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Header Auditor Subview -->
+                <div class="web-subview" id="subview-web-audit" style="display:none;">
+                    <div class="card" style="margin-bottom:16px;">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-shield-alt"></i> HTTP Response Security Header Auditor</div>
+                        </div>
+                        <div class="form-inline">
+                            <div style="flex:1;">
+                                <label class="form-label">Authorized Lab Target URL</label>
+                                <input type="text" id="web-audit-url" class="form-input" value="http://127.0.0.1:5000" placeholder="http://127.0.0.1:5000">
+                            </div>
+                            <button id="btn-audit-headers" class="btn btn-primary"><i class="fa fa-shield-alt"></i> Audit Headers</button>
+                        </div>
+                    </div>
+
+                    <div class="grid-cols-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-list-check"></i> Security Header Verification</div>
+                            </div>
+                            <div class="table-container">
+                                <table class="cyber-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Header Name</th>
+                                            <th>Status</th>
+                                            <th>Value</th>
+                                            <th>Severity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="web-headers-tbody">
+                                        <tr><td colspan="4" class="text-muted" style="text-align:center;">Click 'Audit Headers' to inspect response.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="fa fa-bug"></i> Discovered Web Deficiencies</div>
+                            </div>
+                            <div id="web-audit-findings">
+                                <p class="text-muted" style="font-size:12px;">Audit will flag missing HSTS, CSP, and information disclosure banners.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. SECURITY FINDINGS TRACKER -->
+            <section class="tab-panel" id="panel-findings">
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-bug"></i> Security Findings & Vulnerability Matrix</div>
+                        <button id="btn-add-finding-modal" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Add Finding</button>
+                    </div>
+                    <div class="form-inline">
+                        <div>
+                            <label class="form-label">Severity Filter</label>
+                            <select id="findings-filter-severity" class="form-select">
+                                <option value="all">All Severities</option>
+                                <option value="Critical">Critical</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                                <option value="Informational">Informational</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Status Filter</label>
+                            <select id="findings-filter-status" class="form-select">
+                                <option value="all">All Statuses</option>
+                                <option value="Open">Open</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Remediated">Remediated</option>
+                                <option value="False Positive">False Positive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Severity</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="findings-table-tbody">
+                                <tr><td colspan="7" class="text-muted" style="text-align:center;">Loading findings...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 9. SCAN HISTORY -->
+            <section class="tab-panel" id="panel-scans">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-clock-rotate-left"></i> Historical Reconnaissance Scans</div>
+                    </div>
+                    <div class="table-container">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Target</th>
+                                    <th>Profile</th>
+                                    <th>Status</th>
+                                    <th>Duration</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scans-table-tbody">
+                                <tr><td colspan="7" class="text-muted" style="text-align:center;">Loading past scans...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. ASSESSMENT REPORTS -->
+            <section class="tab-panel" id="panel-reports">
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-file-pdf"></i> Generate Formalized Security Assessment Report (PDF)</div>
+                    </div>
+                    <div class="grid-cols-2" style="align-items:flex-end;">
+                        <div>
+                            <label class="form-label">Report Title</label>
+                            <input type="text" id="report-title-input" class="form-input" value="Security Assessment: 127.0.0.1 Lab Target">
+                        </div>
+                        <div>
+                            <label class="form-label">Assessment Target</label>
+                            <input type="text" id="report-target-input" class="form-input" value="127.0.0.1">
+                        </div>
+                    </div>
+                    <div style="margin-top:14px;text-align:right;">
+                        <button id="btn-generate-report" class="btn btn-primary"><i class="fa fa-file-pdf"></i> Generate & Download Security Report (PDF)</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa fa-folder-closed"></i> Compiled PDF Reports Archive</div>
+                    </div>
+                    <div class="table-container">
+                        <table class="cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Report Title</th>
+                                    <th>Target</th>
+                                    <th>Findings Included</th>
+                                    <th>Generated At</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-table-tbody">
+                                <tr><td colspan="5" class="text-muted" style="text-align:center;">Loading generated reports...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- MODALS -->
+
+<!-- Modal: Packet Payload Inspect -->
+<div class="modal-overlay" id="modal-packet-inspect">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fa fa-eye"></i> Packet Payload Inspector</div>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="terminal-window">
+            <div class="terminal-body" id="modal-packet-payload" style="max-height:300px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Finding Details -->
+<div class="modal-overlay" id="modal-finding-detail">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-detail-title">Finding Detail</div>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <span class="badge" id="modal-detail-severity">Severity</span>
+            <span class="badge badge-info" id="modal-detail-category">Category</span>
+            <code id="modal-detail-target">127.0.0.1</code>
+        </div>
+        <div style="margin-bottom:12px;">
+            <h4 style="font-size:12px;color:#fff;">Description:</h4>
+            <p id="modal-detail-desc" style="font-size:12.5px;color:#94a3b8;"></p>
+        </div>
+        <div style="margin-bottom:12px;">
+            <h4 style="font-size:12px;color:#fff;">Discovered Evidence:</h4>
+            <code id="modal-detail-evidence" style="display:block;background:#030712;padding:8px;border-radius:4px;color:#f59e0b;font-size:11.5px;"></code>
+        </div>
+        <div style="margin-bottom:12px;">
+            <h4 style="font-size:12px;color:#fff;">Actionable Remediation:</h4>
+            <p id="modal-detail-remediation" style="font-size:12.5px;color:#34d399;"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Finding -->
+<div class="modal-overlay" id="modal-add-finding">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fa fa-plus-circle"></i> Record Security Finding</div>
+            <button class="close-btn">&times;</button>
+        </div>
+        <form id="form-add-finding">
+            <div class="form-group">
+                <label class="form-label">Finding Title</label>
+                <input type="text" id="finding-title" class="form-input" required placeholder="e.g. Insecure Telnet Service Discovered">
+            </div>
+            <div class="grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label">Severity</label>
+                    <select id="finding-severity" class="form-select">
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Low">Low</option>
+                        <option value="Informational">Informational</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <input type="text" id="finding-category" class="form-input" value="Network Reconnaissance">
+                </div>
+            </div>
+            <div class="grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label">Target / Asset</label>
+                    <input type="text" id="finding-target" class="form-input" value="127.0.0.1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select id="finding-status" class="form-select">
+                        <option value="Open" selected>Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Remediated">Remediated</option>
+                        <option value="False Positive">False Positive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="finding-description" class="form-textarea" rows="3" placeholder="Explain the risk and discovery context..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Discovered Evidence</label>
+                <input type="text" id="finding-evidence" class="form-input" placeholder="e.g. Port 23/tcp open telnet">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Remediation Guidance</label>
+                <textarea id="finding-remediation" class="form-textarea" rows="2" placeholder="Actionable steps to resolve..."></textarea>
+            </div>
+            <div style="text-align:right;margin-top:16px;">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Save Finding</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Scan Raw Output -->
+<div class="modal-overlay" id="modal-scan-raw">
+    <div class="modal-box" style="width:750px;">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-scan-target">Scan Output</div>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="terminal-window">
+            <div class="terminal-body" id="modal-scan-raw-body" style="max-height:400px;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
